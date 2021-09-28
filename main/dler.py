@@ -40,10 +40,10 @@ ydl_opts = {
 
 
 
-def dl_from_to(yt_url,from_time,to_time,target,format,br):
+def dl_from_to(yt_url,from_time,to_time,target,target_ext,br):
 
 #URL, FROM and TARGET are strings (FROM and TOO example : "00:00:25")
-
+    print('b')
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
 
         result = ydl.extract_info(yt_url, download=False)
@@ -54,8 +54,8 @@ def dl_from_to(yt_url,from_time,to_time,target,format,br):
     ext = video['formats'][0]['ext']
     codec = video['formats'][0]['acodec'] if 'codec' in video['formats'][0] else 'unknown_codec'
 
-    if format == 'mp3':
-
+    if target_ext == 'mp3':
+        print('a')
         target += '.mp3'
         subprocess.call([
         'ffmpeg',
@@ -67,7 +67,7 @@ def dl_from_to(yt_url,from_time,to_time,target,format,br):
         '-acodec', 'libmp3lame','-b:a', '%s' %br, '%s' %target,
         ])
 
-    elif format == 'aac':
+    elif target_ext == 'aac':
 
         target += '.m4a'
         subprocess.call([
@@ -80,7 +80,7 @@ def dl_from_to(yt_url,from_time,to_time,target,format,br):
         '-c:a', 'libfdk_aac','-b:a', '%s' % br, '%s' %target,
         ])
 
-    elif format == None:
+    elif target_ext == None:
 
         target += '_' + codec + '.ogg'
         subprocess.call([
