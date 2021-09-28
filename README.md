@@ -36,8 +36,6 @@ To use **f_streaming** follow the teps :
 
 # Notable bugs
 
-- A file cannot be rewrite so do not download the same file twice, it will stuck the app.
-
 - Sometimes **Genius** API times out, just try once again until it works.
 
 ## Methods
