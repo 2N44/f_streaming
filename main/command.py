@@ -142,6 +142,25 @@ def check_art(path, info_doc):
 
 
 
+def check_audiofile(saved_par, info_doc):
+
+	#chekc if audiofile as already been downloaded
+	if saved_par['format'] == 'mp3':
+
+		path = os.path.join(saved_par['path'], info_doc['album_path'],check_filename(info_doc['title'])+'.mp3')
+
+	elif saved_par['format'] == 'aac':
+
+		path = os.path.join(path, info_doc['album_path'], check_filename(self.song_tag['title'])+'.m4a')
+
+	else:
+
+		path = os.path.join(path, info_doc['album_path'], check_filename(self.song_tag['title'])+'.ogg')
+		
+	return os.path.exists(path)
+
+
+
 def read_txt(path):
 
 	#read a txt and put it in a list

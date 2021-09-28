@@ -65,7 +65,7 @@ class dl_win():
             self.index_tab = 2
 
 
-    def cmd_savemp3(self):#vérifier que le temps final en trop est nécessaire et changer les fonctions temps .py
+    def cmd_savemp3(self):
 
         # #initialize loading screen
         # loading_dl = loading_window()
@@ -125,7 +125,13 @@ class dl_win():
 
             #download mp3      
            
-            dl.dl_from_to(self.url, self.from_time, self.to_time, os.path.join(path, cmd.check_filename(self.song_tag['title'])), self.saved_par['format'], self.saved_par['bitrate'])
+            if not cmd.check_audiofile(self.saved_par, self.song_tag):
+
+                dl.dl_from_to(self.url, self.from_time, self.to_time, os.path.join(path, cmd.check_filename(self.song_tag['title'])), self.saved_par['format'], self.saved_par['bitrate'])
+
+            else:
+
+                print('Already downloaded')
 
             # loading_dl.progress_label = 'Tagging audio file ...'
             # loading_dl.progress()
@@ -177,7 +183,13 @@ class dl_win():
 
             #download mp3
 
-            dl.dl_from_to(self.url, self.from_time, self.to_time, os.path.join(path, cmd.check_filename(self.song_tag['title'])), self.saved_par['format'], self.saved_par['bitrate'])
+            if not cmd.check_audiofile(self.saved_par, self.song_tag):
+
+                dl.dl_from_to(self.url, self.from_time, self.to_time, os.path.join(path, cmd.check_filename(self.song_tag['title'])), self.saved_par['format'], self.saved_par['bitrate'])
+
+            else:
+
+                print('Already downloaded')
 
             # loading_dl.progress_label = 'Tagging audio file ...'
             # loading_dl.progress()
