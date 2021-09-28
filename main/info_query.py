@@ -184,6 +184,8 @@ def info_url(URL):
 
     return search_title,length
 
+
+
 def info_title(search_title,length):
     """
         input : string of youtube url
@@ -363,8 +365,8 @@ def info_title(search_title,length):
             info_doc['track'] = ''
             info_doc['total track'] = ''
 
-        info_doc['album artist'] = genius.search_albums(song.album)['sections'][0]['hits'][0]['result']['artist']['name']
-
+        info_doc['album artist'] = genius.album(album_id)['album']['artist']['name']
+        
         #genres (spotipy)
 
         album = {'genres' : []}#if not able to find album
@@ -405,7 +407,7 @@ def info_title(search_title,length):
 
             info_doc['genre'] = ['']
 
-        info_doc['art url'] = genius.search_albums(song.album)['sections'][0]['hits'][0]['result']['cover_art_url']
+        info_doc['art url'] = genius.album(album_id)['album']['cover_art_url']
 
         if 'png?' in info_doc['art url']:
 
