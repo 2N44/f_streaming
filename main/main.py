@@ -4,6 +4,7 @@ import os
 
 
 def main():
+    
     #locate file
 
     software_path = cmd.file_path()
@@ -12,9 +13,11 @@ def main():
 
     saved_par = cmd.read_param(os.path.join(software_path, 'parameters.json'))
 
+    #default downloads path
+
     if saved_par['path'] == '':
 
-        saved_par['path'] == software_path
+        saved_par['path'] == os.path.join(software_path,'Music')
         cmd.save_param(saved_par, os.path.join(cmd.file_path(), 'parameters.json'))
 
     #open GUI

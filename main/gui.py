@@ -43,6 +43,16 @@ class dl_win():
 
         self.lyrics_window.destroy()
 
+    def cmd_cancel_btn(self):
+
+        if self.total_link == 1:
+
+            self.dl_window.destroy()
+
+        else:
+
+            self.cancel_win()
+
     def cmd_cancelone(self):
 
         self.cancel_window.destroy()
@@ -507,7 +517,7 @@ class dl_win():
         )
         self.btn_cancel = tk.Button(
         master=frm_btns,
-        command = self.cancel_win,
+        command = self.cmd_cancel_btn,
         text='Cancel',
         )
 

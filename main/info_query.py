@@ -1,4 +1,9 @@
+##
+#
 #file where function to founds informations about the music is coded
+#
+##
+
 from __future__ import unicode_literals
 import youtube_dl, lyricsgenius, spotipy, os
 from spotipy.oauth2 import SpotifyClientCredentials
@@ -18,55 +23,96 @@ def delete_words(title):
 
     #/!\ marche pas avec : les artist1 x artist2 trouver une solution
 
+    #delete strings in black_list.txt
+
     forbiden_str = cmd.read_txt(os.path.join(cmd.file_path(), 'black_list.txt'))
 
     for word in forbiden_str :
+
+        word = word[:-1]
+
         if word in title:
-            a = title.find(word)
-            b = a+len(word)-1
-            if a >= 1:
-                title = title[:a-1]+title[b+1:]
+
+            pos_word_init = title.find(word)
+            pos_word_end = pos_word_init + len(word) - 1
+
+            if pos_word_init >= 1:
+
+                title = title[:pos_word_init]+title[pos_word_end+1:]
+
             else:
-                title = title[b+1:]
+
+                title = title[pos_word_end+1:]
+
+    #delete what is in parentheses/bracket
+
     n = len(title)
-    a1 = []
-    a2 = []
-    b1 = []
-    b2 = []
-    for i in range(n):
-        if title[i] == "(":
-            a1.append(i)
-        if title[i] == ")":
-            b1.append(i)
-        if title[i] == "[":
-            a2.append(i)
-        if title[i] == "]":
-            b2.append(i)
-    n1 = len(a1)
-    n2 = len(a2)
-    d = 0
-    for i in range(n1):
-        a = a1[i]-d
-        b = b1[i]-d
-        if a >= 1:
-            title = title[:a-1]+title[b+1:]
+    open_paren = []
+    open_bracket = []
+    close_paren = []
+    close_bracket = []
+
+    for char_index in range(n):
+
+        if title[char_index] == '(':
+
+            open_paren.append(char_index )
+
+        if title[char_index] == ')':
+
+            close_paren.append(char_index )
+
+        if title[char_index] == '[':
+
+            open_bracket.append(char_index )
+
+        if title[char_index] == ']':
+
+            close_bracket.append(char_index )
+
+    n_paren = len(open_paren)
+    n_bracket = len(open_bracket)
+    delta_char = 0
+
+    for index_paren in range(n_paren):
+
+        pos_paren_init = open_paren[index_paren] - delta_char
+        pos_paren_end = close_paren[index_paren] - delta_char
+
+        if pos_paren_init >= 1:
+
+            title = title[:pos_paren_init-1]+title[pos_paren_end+1:]
+
         else:
-            title = title[b+1:]
-        d += b - a+1
-    for i in range(n2):
-        a = a2[i]-d
-        b = b2[i]-d
-        if a >= 1:
-            title = title[:a-1]+title[b+1:]
+
+            title = title[pos_paren_end+1:]
+
+        delta_char += pos_paren_end - pos_paren_init + 1
+
+    for index_bracket in range(n_bracket):
+
+        pos_bracket_init = open_bracket[index_bracket] - delta_char
+        pos_bracket_end = close_bracket[index_bracket] - delta_char
+
+        if pos_bracket_init >= 1:
+
+            title = title[:pos_bracket_init-1]+title[pos_bracket_end+1:]
+
         else:
-            title = title[b+1:]
-        d += b - a +1
+
+            title = title[pos_bracket_end+1:]
+
+        delta_char += pos_bracket_end - pos_bracket_init + 1
+
+    #delete featuring
 
     if ' ft.' in title.lower():
+
         pos_ft = title.find(' ft.')
         title = title[0:pos_ft]
 
     if ' feat' in title.lower():
+
         pos_ft = title.find(' feat')
         title = title[0:pos_ft]
 
