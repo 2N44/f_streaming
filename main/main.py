@@ -4,7 +4,7 @@ import os
 
 
 def main():
-    
+
     #locate file
 
     software_path = cmd.file_path()
@@ -17,7 +17,7 @@ def main():
 
     if saved_par['path'] == '':
 
-        saved_par['path'] == os.path.join(software_path,'Music')
+        saved_par['path'] = os.path.join(software_path,'Music')
         cmd.save_param(saved_par, os.path.join(cmd.file_path(), 'parameters.json'))
 
     #open GUI

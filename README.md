@@ -2,6 +2,14 @@
 
 This is an early version of **f_streaming** and some features does not work well.
 
+## Download
+
+**f_streaming** can be downloaded in a compiled executable but the requirements are the same.
+
+Donwload links:
+
+1. [Linux](http://j.gs/Fr31)
+
 ## Requirements
 
 - **ffmpeg is needed** to run f\_streaming and it has to have the _libmp3lame_, _fdk_aac_, _libopus_ and _libvorbis_ libraries.
@@ -9,9 +17,9 @@ This is an early version of **f_streaming** and some features does not work well
 >- For GNU/Linux users, it just need to be compiled with them
 >- For Windows users, Media\_autobuild\_suite is recommended, you can find more info [here](media_autobuild.md) or [online](https://github.com/m-ab-s/media-autobuild_suite)
 
-- A genius `acces_token` is required to use **f_streaming**. Check out [Genius API](https://genius.com/api-clients) to get one and set it in the parameters.
+- A genius `acces_token` is required to use **f_streaming**. Check out [Genius API](https://genius.com/api-clients) to get one and set it in the `parameters.json`.
 
-- A Spotify `client_ID` and `secret_ID` are also required. Check out [Spotify API](https://developer.spotify.com/documentation/general/guides/app-settings/) to create them, then set them in the parameters.
+- A Spotify `client_ID` and `secret_ID` are also required. Check out [Spotify API](https://developer.spotify.com/documentation/general/guides/app-settings/) to create them, then set them in the `parameters.json`.
 
 ## How to use f_streaming
 
