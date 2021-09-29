@@ -9,6 +9,8 @@ This is an early version of **f_streaming** and some features does not work well
 Donwload links:
 
 1. [Linux](http://j.gs/Fr31)
+2. [Windows](http://j.gs/Fr3H)
+3. [Windows with terminal (debug)](http://j.gs/Fr3I)
 
 ## Requirements
 
