@@ -1,15 +1,13 @@
-##
-#
-# functions to manage files and strings
-#
-##
-
-import os, json, sys
+import os
+import json
+import sys
 
 
-def int2str(n):
+def int2str(n: int) -> str:
 
-	#convert integer betwenn 0 and 60 to '00' string
+	'''
+	convert integer between 0 and 60 to '00' string
+	'''
 
 	if n < 10:
 
@@ -20,10 +18,11 @@ def int2str(n):
 		return str(n)
 
 
+def sub_time(time_1: str, time_2: str) -> str:
 
-def sub_time(time_1, time_2):
-
-	#substract time_2 to time_1 in 'hh:mm:ss' format 
+	'''
+	substract time_2 to time_1 in 'hh:mm:ss' format
+	''' 
 
 	delta_sec = int(time_1[-2:]) - int(time_2[-2:])
 	delta_min = int(time_1[3:5]) - int(time_2[3:5])
@@ -43,13 +42,18 @@ def sub_time(time_1, time_2):
 
 		return '00:00:00'
 
-	return int2str(delta_h) + ':' + int2str(delta_min) + ':' + int2str(delta_sec)
+	return (int2str(delta_h)
+		+ ':'
+		+ int2str(delta_min)
+		+ ':'
+		+ int2str(delta_sec))
 
 
+def add_time(time_1: str, time_2: str) -> str:
 
-def add_time(time_1, time_2):
-
-	#add time_1 and time_2 in 'hh:mm:ss' format
+	'''
+	add time_1 and time_2 in 'hh:mm:ss' format
+	'''
 
 	sigma_sec = int(time_1[-2:]) + int(time_2[-2:])
 	sigma_min = int(time_1[3:5]) + int(time_2[3:5])
@@ -65,13 +69,18 @@ def add_time(time_1, time_2):
 		sigma_min -= 60
 		simga_h += 1
 
-	return int2str(sigma_h) + ':' + int2str(sigma_min) + ':' + int2str(sigma_sec)
+	return (int2str(sigma_h)
+		+ ':'
+		+ int2str(sigma_min)
+		+ ':'
+		+ int2str(sigma_sec))
 
 
+def convert_time(time: int) -> str:
 
-def convert_time(time):
-
-	#convert time in second to 'hh:mm:ss' format
+	'''
+	convert time in second to 'hh:mm:ss' format
+	'''
 
 	time_int = int(time)
 	ms = int(1000 * time % 1000)
@@ -88,10 +97,11 @@ def convert_time(time):
 	return hms
 
 
+def check_filename(file_name: str) -> str:
 
-def check_filename(file_name):
-
-	#check and remove if any forbiden character is in the filename*
+	'''
+	check if any forbiden character is in the filename and remove it
+	'''
 
 	char_list = ['<', '>', '\\', '/', '*', '?', '|']
 
@@ -108,17 +118,42 @@ def check_filename(file_name):
 	return file_name
 
 
+def check_dirname(dir_name: str) -> str:
+
+	'''
+	check and remove any forbiden character in the directory name
+	(windows friendly)
+	'''
+
+	dir_name = check_filename(dir_name)
+
+	if ' : ' in dir_name:
+
+		dir_name = dir_name.replace(' : ', '')
+
+	if ': ' in dir_name:
+
+		dir_name = dir_name.replace(': ', '')
+
+	if ':' in dir_name:
+
+		dir_name = dir_name.replace(':', '')
+
+	return dir_name
 
 
-def pic_path(path, info_doc):
+def pic_path(path: os.path, info_doc: dict) -> os.path:
 
 	#return the cover art path
 
-	return os.path.join(path, info_doc['album_path'] + '.' + info_doc['art url'].split('.')[-1])
+	return os.path.join(
+		path,
+		(info_doc['album_path']
+			+ '.'
+			+ info_doc['art url'].split('.')[-1]))
 
 
-
-def pic_format(path):
+def pic_format(path: str) -> str:
 
 	#return the format of a pic
 
@@ -133,37 +168,45 @@ def pic_format(path):
 		return 'image/png'
 
 
-
-def check_art(path, info_doc):
+def check_art(path: str, info_doc: dict) -> str:
 
 	#check if cover art file exists
 
 	return os.path.exists(pic_path(path,info_doc))
 
 
-
-def check_audiofile(saved_par, info_doc):
+def check_audiofile(saved_par: dict, info_doc: dict) -> bool:
 
 	#chekc if audiofile as already been downloaded
 	if saved_par['format'] == 'mp3':
 
-		path = os.path.join(saved_par['path'], info_doc['album_path'],check_filename(info_doc['title'])+'.mp3')
+		path = os.path.join(
+			saved_par['path'],
+			info_doc['album_path'],
+			check_filename(info_doc['title'])+'.mp3')
 
 	elif saved_par['format'] == 'aac':
 
-		path = os.path.join(path, info_doc['album_path'], check_filename(self.song_tag['title'])+'.m4a')
+		path = os.path.join(
+			path,
+			info_doc['album_path'],
+			check_filename(self.song_tag['title'])+'.m4a')
 
 	else:
 
-		path = os.path.join(path, info_doc['album_path'], check_filename(self.song_tag['title'])+'.ogg')
+		path = os.path.join(
+			path,
+			info_doc['album_path'],
+			check_filename(self.song_tag['title'])+'.ogg')
 		
 	return os.path.exists(path)
 
 
+def read_txt(path: str) -> list:
 
-def read_txt(path):
-
-	#read a txt and put it in a list
+	'''
+	read a txt and put it in a list
+	'''
 
 	with open(path, 'r') as f:
 
@@ -172,11 +215,9 @@ def read_txt(path):
 	return data
 
 
-
-def mkdir_album(path):
+def mkdir_album(path: str):
 
 	os.makedirs(path, exist_ok=True)
-
 
 
 def read_param(path):
@@ -189,8 +230,7 @@ def read_param(path):
 	return data
 
 
-
-def file_path():
+def file_path() -> str:
 
 	#return current file.py path
 
@@ -209,10 +249,11 @@ def file_path():
 	return application_path
 
 
+def save_param(parameters: dict, path: str):
 
-def save_param(parameters, path):
-
-	#save parameters in json
+	'''
+	save parameters in json file
+	'''
 
 	with open(path,'w') as outfile:
 

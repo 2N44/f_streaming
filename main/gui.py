@@ -4,7 +4,9 @@
 #
 ##
 
-import sys, json, os
+import sys
+import json
+import os
 import tkinter as tk
 from tkinter import ttk
 from PIL import ImageTk, Image
@@ -15,10 +17,11 @@ import command as cmd
 import tag
 
 
-
 class dl_win():
 
-    def __init_win__(self, index_link, total_link, total_modified, total_cancel, total_dl, song_tag, saved_param,url):
+    def __init_win__(
+            self, index_link, total_link, total_modified, total_cancel,
+            total_dl, song_tag, saved_param,url):
 
         self.index_link = index_link
         self.total_link = total_link
@@ -85,7 +88,9 @@ class dl_win():
         #save
 
         self.from_time = cmd.sub_time(self.ent_init.get(), '00:00;15')
-        self.to_time = cmd.add_time(cmd.sub_time(self.ent_final.get(), self.from_time),'00:00:15')
+        self.to_time = cmd.add_time(
+            cmd.sub_time(self.ent_final.get(), self.from_time),
+            '00:00:15')
 
         if self.index_tab == 1:
 
@@ -96,7 +101,8 @@ class dl_win():
             self.song_tag['publisher'] = self.ent_ent7_v1.get()
             self.song_tag['genre'] = self.ent_ent8_v1.get()
             self.song_tag['date'] = self.ent_ent9_v1.get()
-            self.song_tag['album_path'] = cmd.check_filename(self.song_tag['album'])
+            self.song_tag['album_path'] = cmd.check_dirname(
+                self.song_tag['album'])
 
             if self.ent_ent4_v1.get() != '':
 
@@ -114,7 +120,8 @@ class dl_win():
 
                 self.song_tag['total track'] = None
 
-            path =  os.path.join(self.saved_par['path'], self.song_tag['album_path'])
+            path =  os.path.join(
+                self.saved_par['path'], self.song_tag['album_path'])
 
             # loading_dl.progress_label = 'Creating directory ...'
             # loading_dl.progress()
@@ -137,7 +144,15 @@ class dl_win():
            
             if not cmd.check_audiofile(self.saved_par, self.song_tag):
 
-                dl.dl_from_to(self.url, self.from_time, self.to_time, os.path.join(path, cmd.check_filename(self.song_tag['title'])), self.saved_par['format'], self.saved_par['bitrate'])
+                dl.dl_from_to(
+                    self.url,
+                    self.from_time,
+                    self.to_time,
+                    os.path.join(
+                        path,
+                        cmd.check_filename(self.song_tag['title'])),
+                    self.saved_par['format'],
+                    self.saved_par['bitrate'])
 
             else:
 
@@ -150,7 +165,9 @@ class dl_win():
 
             if self.saved_par['format'] == 'mp3':
 
-                path = os.path.join(path, cmd.check_filename(self.song_tag['title'])+'.mp3')
+                path = os.path.join(
+                    path,
+                    cmd.check_filename(self.song_tag['title'])+'.mp3')
                 tag.tag_v1(path, self.song_tag)
 
             # loading_dl.progress_label = 'Done'
@@ -170,9 +187,12 @@ class dl_win():
             self.song_tag['date'] = self.ent_ent10_v2.get()
             self.from_time = self.ent_init.get()
             self.to_time = self.ent_final.get()
-            self.song_tag['album_path'] = cmd.check_filename(self.song_tag['album'])
+            self.song_tag['album_path'] = cmd.check_dirname(
+                self.song_tag['album'])
 
-            path =  os.path.join(self.saved_par['path'], self.song_tag['album_path'])
+            path =  os.path.join(
+                self.saved_par['path'],
+                self.song_tag['album_path'])
 
             # loading_dl.progress_label = 'Creating directory ...'
             # loading_dl.progress()
@@ -195,7 +215,15 @@ class dl_win():
 
             if not cmd.check_audiofile(self.saved_par, self.song_tag):
 
-                dl.dl_from_to(self.url, self.from_time, self.to_time, os.path.join(path, cmd.check_filename(self.song_tag['title'])), self.saved_par['format'], self.saved_par['bitrate'])
+                dl.dl_from_to(
+                    self.url,
+                    self.from_time,
+                    self.to_time,
+                    os.path.join(
+                        path,
+                        cmd.check_filename(self.song_tag['title'])),
+                    self.saved_par['format'],
+                    self.saved_par['bitrate'])
 
             else:
 
@@ -208,7 +236,9 @@ class dl_win():
 
             if self.saved_par['format'] == 'mp3':
 
-                path = os.path.join(path, cmd.check_filename(self.song_tag['title']) + '.mp3')
+                path = os.path.join(
+                    path,
+                    cmd.check_filename(self.song_tag['title']) + '.mp3')
                 tag.tag_v2(path, self.song_tag)
 
             # loading_dl.progress_label = 'Done'
@@ -216,19 +246,23 @@ class dl_win():
 
         self.dl_window.destroy()
 
-
-
     def cmd_retry(self):
 
         if self.index_tab:
 
-            search_title = str(self.ent_ent1_v1.get())+' - '+str(self.ent_ent2_v1.get())
+            search_title = (str(self.ent_ent1_v1.get())
+                +' - '
+                +str(self.ent_ent2_v1.get()))
 
         else:
 
-            search_title = str(self.ent_ent1_v2.get())+' - '+str(self.ent_ent2_v2.get())
+            search_title = (str(self.ent_ent1_v2.get())
+                +' - '
+                +str(self.ent_ent2_v2.get()))
 
-        self.song_tag = info.info_query_title(search_title, self.song_tag['length'])
+        self.song_tag = info.info_query_title(
+            search_title,
+            self.song_tag['length'])
         self.ent_ent1_v1.delete(0, "end")
         self.ent_ent2_v1.delete(0, "end")
         self.ent_ent3_v1.delete(0, "end")
@@ -267,19 +301,13 @@ class dl_win():
         self.ent_ent9_v2.insert(0, self.song_tag['genre'])
         self.ent_ent10_v2.insert(0, self.song_tag['date'])
 
-
-
     def cmd_key_return(self):
 
         self.btn_save.invoke()
 
-
-
     def cmd_key_escape(self):
 
         self.btn_cancel.invoke()
-
-
 
     def lyrics_win(self):
 
@@ -299,7 +327,9 @@ class dl_win():
 
         #label
 
-        lbl_title = tk.Label(master=frm_text, text = str(self.song_tag['title'])+' :')
+        lbl_title = tk.Label(
+            master=frm_text,
+            text=str(self.song_tag['title'])+' :')
 
         #text_box
 
@@ -329,8 +359,6 @@ class dl_win():
         frm_text.grid(row=0, column=0, sticky='nsew')
         frm_btns.grid(row=1, column=0, sticky='ew')
 
-
-
     def cancel_win(self):
 
         #open window
@@ -349,20 +377,21 @@ class dl_win():
 
         #label
 
-        lbl_msg = tk.Label(master=frm_msg, text='Do you want to cancel this download or all of them ?')
+        lbl_msg = tk.Label(
+            master=frm_msg,
+            text='Do you want to cancel this download or all of them ?'
+            )
 
         #button
 
         btn_one = tk.Button(
-        master=frm_btns,
-        text='Cancel this one',
-        command=self.cmd_cancelone
-        )
+            master=frm_btns,
+            text='Cancel this one',
+            command=self.cmd_cancelone)
         btn_all = tk.Button(
-        master=frm_btns,
-        text='Cancel all',
-        command=self.cmd_cancelall
-        )
+            master=frm_btns,
+            text='Cancel all',
+            command=self.cmd_cancelall)
 
         #display
 
@@ -373,13 +402,13 @@ class dl_win():
         frm_msg.grid(row=0, column=0, sticky='nsew')
         frm_btns.grid(row=0, column=1, sticky='ns')
 
-
-
     def open_dl(self):
 
         self.dl_window = tk.Tk()
         self.dl_window.title(self.song_tag['title']+'.mp3')        
-        self.dl_window.iconphoto(True, tk.PhotoImage(file='fstreaming_icon.png'))
+        self.dl_window.iconphoto(
+            True,
+            tk.PhotoImage(file='fstreaming_icon.png'))
 
         # create a notebook
 
@@ -447,10 +476,18 @@ class dl_win():
         lbl_ent8_v2 = ttk.Label(master=frm_ent8_v2, text='Publisher :')
         lbl_ent9_v2 = ttk.Label(master=frm_ent9_v2, text='Genre :')
         lbl_ent10_v2 = ttk.Label(master=frm_ent10_v2, text='Date :')
-        lbl_count1 = tk.Label(master=frm_count, text=str(self.index_link+1)+'/'+str(self.total_link))
-        lbl_count2 = tk.Label(master=frm_count, text=str(self.total_canceled)+' canceled')
-        lbl_count3 = tk.Label(master=frm_count, text=str(self.total_modified)+' modified')
-        lbl_count4 = tk.Label(master=frm_count, text=str(self.total_dl)+' downloaded')
+        lbl_count1 = tk.Label(
+            master=frm_count,
+            text=str(self.index_link+1)+'/'+str(self.total_link))
+        lbl_count2 = tk.Label(
+            master=frm_count,
+            text=str(self.total_canceled)+' canceled')
+        lbl_count3 = tk.Label(
+            master=frm_count,
+            text=str(self.total_modified)+' modified')
+        lbl_count4 = tk.Label(
+            master=frm_count,
+            text=str(self.total_dl)+' downloaded')
         lbl_init = tk.Label(master=frm_ent_s, text='Starting time :')
         lbl_final = tk.Label(master=frm_ent_f, text='Ending time :')
 
@@ -548,25 +585,124 @@ class dl_win():
         lbl_init.grid(row=0, column=0, sticky='w', padx=5, pady=5)
         lbl_final.grid(row=0, column=0, sticky='w', padx=5, pady=5)
 
-        self.ent_ent1_v1.grid(row=1, column=0, sticky='w' ,padx=5, pady=5, ipadx=100)
-        self.ent_ent2_v1.grid(row=1, column=0, sticky='w' ,padx=5, pady=5, ipadx=100)
-        self.ent_ent3_v1.grid(row=1, column=0, sticky='w' ,padx=5, pady=5, ipadx=100)
-        self.ent_ent4_v1.grid(row=1, column=0, sticky='w' ,padx=5, pady=5, ipadx=100)
-        self.ent_ent5_v1.grid(row=1, column=0, sticky='w' ,padx=5, pady=5, ipadx=100)
-        self.ent_ent6_v1.grid(row=1, column=0, sticky='w' ,padx=5, pady=5, ipadx=100)
-        self.ent_ent7_v1.grid(row=1, column=0, sticky='w' ,padx=5, pady=5, ipadx=100)
-        self.ent_ent8_v1.grid(row=1, column=0, sticky='w' ,padx=5, pady=5, ipadx=100)
-        self.ent_ent9_v1.grid(row=1, column=0, sticky='w' ,padx=5, pady=5, ipadx=100)
-        self.ent_ent1_v2.grid(row=1, column=0, sticky='w' ,padx=5, pady=5, ipadx=100)
-        self.ent_ent2_v2.grid(row=1, column=0, sticky='w' ,padx=5, pady=5, ipadx=100)
-        self.ent_ent3_v2.grid(row=1, column=0, sticky='w' ,padx=5, pady=5, ipadx=100)
-        self.ent_ent4_v2.grid(row=1, column=0, sticky='w' ,padx=5, pady=5, ipadx=100)
-        self.ent_ent5_v2.grid(row=1, column=0, sticky='w' ,padx=5, pady=5, ipadx=100)
-        self.ent_ent6_v2.grid(row=1, column=0, sticky='w' ,padx=5, pady=5, ipadx=100)
-        self.ent_ent7_v2.grid(row=1, column=0, sticky='w' ,padx=5, pady=5, ipadx=100)
-        self.ent_ent8_v2.grid(row=1, column=0, sticky='w' ,padx=5, pady=5, ipadx=100)
-        self.ent_ent9_v2.grid(row=1, column=0, sticky='w' ,padx=5, pady=5, ipadx=100)
-        self.ent_ent10_v2.grid(row=1, column=0, sticky='w' ,padx=5, pady=5, ipadx=100)
+        self.ent_ent1_v1.grid(
+            row=1,
+            column=0,
+            sticky='w',
+            padx=5,
+            pady=5,
+            ipadx=100)
+        self.ent_ent2_v1.grid(
+            row=1,
+            column=0,
+            sticky='w',
+            padx=5,
+            pady=5,
+            ipadx=100)
+        self.ent_ent3_v1.grid(
+            row=1,
+            column=0,
+            sticky='w',
+            padx=5,
+            pady=5,
+            ipadx=100)
+        self.ent_ent4_v1.grid(
+            row=1,
+            column=0,
+            sticky='w',
+            padx=5,
+            pady=5,
+            ipadx=100)
+        self.ent_ent5_v1.grid(
+            row=1,
+            column=0,
+            sticky='w',
+            padx=5,
+            pady=5,
+            ipadx=100)
+        self.ent_ent6_v1.grid(
+            row=1,
+            column=0,
+            sticky='w',
+            padx=5,
+            pady=5,
+            ipadx=100)
+        self.ent_ent7_v1.grid(
+            row=1,
+            column=0,
+            sticky='w',
+            padx=5,
+            pady=5,
+            ipadx=100)
+        self.ent_ent8_v1.grid(
+            row=1,
+            column=0,
+            sticky='w',
+            padx=5,
+            pady=5,
+            ipadx=100)
+        self.ent_ent9_v1.grid(
+            row=1,
+            column=0,
+            sticky='w',
+            padx=5,
+            pady=5,
+            ipadx=100)
+        self.ent_ent1_v2.grid(
+            row=1,
+            column=0,
+            sticky='w',
+            padx=5,
+            pady=5,
+            ipadx=100)
+        self.ent_ent2_v2.grid(
+            row=1,
+            column=0,
+            sticky='w',
+            padx=5,
+            pady=5,
+            ipadx=100)
+        self.ent_ent3_v2.grid(
+            row=1, column=0, sticky='w' ,padx=5, pady=5, ipadx=100)
+        self.ent_ent4_v2.grid(
+            row=1, column=0, sticky='w' ,padx=5, pady=5, ipadx=100)
+        self.ent_ent5_v2.grid(
+            row=1, column=0, sticky='w' ,padx=5, pady=5, ipadx=100)
+        self.ent_ent6_v2.grid(
+            row=1,
+            column=0,
+            sticky='w',
+            padx=5,
+            pady=5,
+            ipadx=100)
+        self.ent_ent7_v2.grid(
+            row=1,
+            column=0,
+            sticky='w',
+            padx=5,
+            pady=5,
+            ipadx=100)
+        self.ent_ent8_v2.grid(
+            row=1,
+            column=0,
+            sticky='w',
+            padx=5,
+            pady=5,
+            ipadx=100)
+        self.ent_ent9_v2.grid(
+            row=1,
+            column=0,
+            sticky='w',
+            padx=5,
+            pady=5,
+            ipadx=100)
+        self.ent_ent10_v2.grid(
+            row=1,
+            column=0,
+            sticky='w',
+            padx=5,
+            pady=5,
+            ipadx=100)
         self.ent_init.grid(row=1, column=0, sticky='ew', padx=5, pady=5)
         self.ent_final.grid(row=1, column=0, sticky='ew', padx=5, pady=5)
 
@@ -603,11 +739,14 @@ class dl_win():
 
         #bind keys
 
-        self.dl_window.bind('<Return>', lambda event : self.cmd_key_return())
-        self.dl_window.bind('<Escape>', lambda event : self.cmd_key_escape())
+        self.dl_window.bind(
+            '<Return>',
+            lambda event : self.cmd_key_return())
+        self.dl_window.bind(
+            '<Escape>',
+            lambda event : self.cmd_key_escape())
 
         self.dl_window.mainloop()
-
 
 
 class main_win():
@@ -624,7 +763,9 @@ class main_win():
 
         self.main_window = tk.Tk()
         self.main_window.title('F_streaming')
-        self.main_window.iconphoto(True, tk.PhotoImage(file='fstreaming_icon.png'))
+        self.main_window.iconphoto(
+            True,
+            tk.PhotoImage(file='fstreaming_icon.png'))
 
         #grid
 
@@ -636,7 +777,6 @@ class main_win():
         frm_title = tk.Frame(master=self.main_window)
         frm_dl = tk.Frame(master=self.main_window)
 
-        #lbl_title = tk.Label(master=frm_title,text="F_streaming",bg='red',fg='white',width=15,height=3)
         self.logo = ImageTk.PhotoImage(Image.open('logo_resize.png'))
         lbl_title = tk.Label(master=frm_title, image=self.logo)
 
@@ -650,15 +790,13 @@ class main_win():
             text="Parameters",
             width=8,
             height=3,
-            command = self.par_win,
-        )
+            command = self.par_win)
         self.btn_dl = tk.Button(
             master=frm_dl,
             text="Download",
             width=8,
             height=3,
-            command = self.cmd_opendl
-        )
+            command = self.cmd_opendl)
 
         #display
 
@@ -672,11 +810,11 @@ class main_win():
 
         #bind keypress event
 
-        self.main_window.bind('<Return>', lambda event : self.cmd_key_return())
+        self.main_window.bind(
+            '<Return>',
+            lambda event : self.cmd_key_return())
 
         self.main_window.mainloop()
-
-
 
     def par_win(self):#finir affichage des datas
 
@@ -759,8 +897,20 @@ class main_win():
         lbl_sp_sc.grid(row=3, column=0, sticky='e',padx=5, pady=5)
         self.ent_path.grid(row=0, column=0, sticky='ew', padx=5, pady=5)
         self.ent_genius.grid(row=1, column=0, sticky='ew', padx=5, pady=5)
-        self.ent_sp_id.grid(row=2, column=0, sticky='ew', padx=5, pady=5, ipadx=200)
-        self.ent_sp_sc.grid(row=3, column=0, sticky='ew', padx=5, pady=5, ipadx=200)
+        self.ent_sp_id.grid(
+            row=2,
+            column=0,
+            sticky='ew',
+            padx=5,
+            pady=5,
+            ipadx=200)
+        self.ent_sp_sc.grid(
+            row=3,
+            column=0,
+            sticky='ew',
+            padx=5,
+            pady=5,
+            ipadx=200)
 
         frm_name.grid(row=0, column=0, sticky='ew')
         frm_str.grid(row=0, column=1, sticky='ew')
@@ -770,10 +920,12 @@ class main_win():
 
         #bind keys to the window
 
-        self.par_window.bind('<Return>', lambda event : self.cmd_key_return_par())
-        self.par_window.bind('<Escape>', lambda event : self.cmd_key_escape_par())
-
-
+        self.par_window.bind(
+            '<Return>',
+            lambda event : self.cmd_key_return_par())
+        self.par_window.bind(
+            '<Escape>',
+            lambda event : self.cmd_key_escape_par())
 
     def cmd_opendl(self): #rajouter un chargement lors du lecture des infos
 
@@ -807,7 +959,23 @@ class main_win():
         total_dl = 0
         cancel = False
         modified = False
-        lst_key = ['title', 'title ft', 'album', 'artist', 'album artist', 'track', 'total track', 'date', 'publisher', 'lyrics', 'genre', 'language', 'composer', 'text writer', 'year', 'art url']
+        lst_key = [
+            'title',
+            'title ft',
+            'album',
+            'artist',
+            'album artist',
+            'track',
+            'total track',
+            'date',
+            'publisher',
+            'lyrics',
+            'genre',
+            'language',
+            'composer',
+            'text writer',
+            'year',
+            'art url']
         
         self.main_window.destroy()
 
@@ -815,7 +983,15 @@ class main_win():
 
             info_tag = info_tags[index_link]
             dl_window = dl_win()
-            dl_window.__init_win__(index_link, total_link, total_modified, total_cancel, total_dl, info_tag, self.saved_par, url_list[index_link])
+            dl_window.__init_win__(
+                index_link,
+                total_link,
+                total_modified,
+                total_cancel,
+                total_dl,
+                info_tag,
+                self.saved_par,
+                url_list[index_link])
             dl_window.open_dl()
 
             if dl_window.cancelall == True:
@@ -838,11 +1014,10 @@ class main_win():
 
         #load saved parameters
 
-        saved_par = cmd.read_param(os.path.join(self.software_path, 'parameters.json'))
+        saved_par = cmd.read_param(
+            os.path.join(self.software_path, 'parameters.json'))
         main_window.__init_main__(saved_par, self.software_path)
         main_window.open_main()
-
-
 
     def cmd_key_return(self):
 
@@ -850,19 +1025,13 @@ class main_win():
 
         self.btn_dl.invoke()
 
-
-
     def cmd_key_return_par(self):
 
         self.btn_save.invoke()
 
-
-
     def cmd_key_escape_par(self):
 
         self.btn_cancel.invoke()
-
-
 
     def cmd_save_par(self):
 
@@ -891,13 +1060,16 @@ class main_win():
         }
         self.saved_par = params
 
-        cmd.save_param(self.saved_par, os.path.join(cmd.file_path(), 'parameters.json'))
+        cmd.save_param(
+            self.saved_par,
+            os.path.join(cmd.file_path(), 'parameters.json'))
 
         self.par_window.destroy()
 
 
-#not used yet (need multithreading)
 class loading_window():
+
+    #not used yet (need multithreading)
 
     def _init_loading(self, root_window, total_queue, label):
 
@@ -909,7 +1081,6 @@ class loading_window():
 
         return self.progress_label
 
-
     def progress(self):
 
         if self.pb['value'] < 100:
@@ -920,7 +1091,6 @@ class loading_window():
         else:
 
             showinfo(message='Done')
-
 
     def stop(self):
 
@@ -934,7 +1104,9 @@ class loading_window():
         self.load_window.title('Loading ...')
 
         # label
-        self.lbl_msg = ttk.Label(master=self.load_window, text=self.progress_label)
+        self.lbl_msg = ttk.Label(
+            master=self.load_window,
+            text=self.progress_label)
 
         # progressbar
         self.pb = ttk.Progressbar(

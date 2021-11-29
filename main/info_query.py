@@ -15,13 +15,18 @@ client_id = saved_param['spotify client id']
 client_secret = saved_param['spotify client secret']
 token_genius = saved_param['token genius']
 
-client_credentials_manager = SpotifyClientCredentials(client_id=client_id, client_secret=client_secret)
+client_credentials_manager = SpotifyClientCredentials(
+    client_id=client_id,
+    client_secret=client_secret)
 sp = spotipy.Spotify(client_credentials_manager = client_credentials_manager)
 genius = lyricsgenius.Genius(token_genius)
 
-def delete_words(title):
 
-    #/!\ marche pas avec : les artist1 x artist2 trouver une solution
+def clean_title(title: str) -> str:
+
+    '''
+    delete certain word patern
+    '''
 
     #delete strings in black_list.txt
 
@@ -119,8 +124,11 @@ def delete_words(title):
     return title
 
 
+def info_playlist(url_playlist: str) -> list:
 
-def info_playlist(URL):
+    '''
+    Exract list of videos url from a playlist url
+    '''
 
     class MyLogger(object):
 
@@ -135,7 +143,6 @@ def info_playlist(URL):
         def error(self, msg):
 
             print(msg)
-
 
 
     def my_hook(d):
@@ -160,7 +167,7 @@ def info_playlist(URL):
 
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
 
-        result = ydl.extract_info(URL, download=False)
+        result = ydl.extract_info(url_playlist, download=False)
         n_vid = len(result['entries']) if 'entries' in result else 1
         video = result['entries'][0] if 'entries' in result else result
         videos = [video['webpage_url']]
@@ -175,8 +182,7 @@ def info_playlist(URL):
     return videos
 
 
-
-def info_url(URL):
+def info_url(url_video: str) -> (str, str):
 
 
 
@@ -206,12 +212,12 @@ def info_url(URL):
         'progress_hooks': [my_hook],
     }
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-        result = ydl.extract_info(URL, download=False)
+        result = ydl.extract_info(url_video, download=False)
         video = result['entries'][0] if 'entries' in result else result
 
     #define search title
     search_title = video['title']
-    search_title = delete_words(search_title)
+    search_title = clean_title(search_title)
 
     if (not ' - ' in search_title) and 'artist' in result:
 
@@ -222,18 +228,18 @@ def info_url(URL):
             pos_coma = search_title.find(',')
             search_title = search_title[:pos_coma]
 
-    if 'soundcloud' in URL:
+    if 'soundcloud' in url_video:
 
         search_title = search_title + ' - ' + video['uploader']
 
     length = cmd.convert_time(video['duration'])
 
-    return search_title,length
+    return (search_title, length)
 
 
+def info_title(search_title: str,length: str) -> dict:
 
-def info_title(search_title,length):
-    """
+    '''
         input : string of youtube url
 
         output : dictionnary with song the following infos
@@ -256,11 +262,10 @@ def info_title(search_title,length):
                 'disc number'       number of the disc (integer)
                 'disc total number' total number of disc (integer)
                 'year'              year of release (integer)
-
-    """
+    '''
 
     #define info dictionnary
-    info_doc = {
+    metadata = {
                 'title' :             '',
                 'title ft' :          '',
                 'album' :             '',
@@ -285,61 +290,63 @@ def info_title(search_title,length):
     song = genius.search_song(search_title)
 
     #duration
-    info_doc['length'] = length
+    metadata['length'] = length
 
-    if song == None:
+    if song is None:
 
         song = genius.search_song('404 not found')
 
     #song info
-    info_doc['title'] = song.title
-    info_doc['title ft'] = song._body['title_with_featured']
-    info_doc['album'] = song.album
-    info_doc['artist'][0] = song.artist
+    metadata['title'] = song.title
+    metadata['title ft'] = song._body['title_with_featured']
+    metadata['album'] = song.album
+    metadata['artist'][0] = song.artist
 
     if song._body['featured_artists']!=[]:
 
         for i in range(len(song._body['featured_artists'])):
 
-            info_doc['artist'].append(song._body['featured_artists'][i]['name'])
+            metadata['artist'].append(song._body['featured_artists'][i]['name'])
 
     if song.year != None:
 
-        info_doc['date'] = song.year
+        metadata['date'] = song.year
 
     if song.year != '':
 
-        info_doc['year'] = info_doc['date'][0:4]
+        metadata['year'] = metadata['date'][0:4]
 
-    info_doc['lyrics'] = song.lyrics
+    metadata['lyrics'] = song.lyrics
 
     #rajouter custom performance
 
     if song.writer_artists != []:
 
-        info_doc['text writer'][0] = song.writer_artists[0]['name']
+        metadata['text writer'][0] = song.writer_artists[0]['name']
 
         if len(song.writer_artists)>1:
 
             for i in range(1,len(song.writer_artists)):
 
-                info_doc['text writer'].append(song.writer_artists[i]['name'])
+                metadata['text writer'].append(song.writer_artists[i]['name'])
 
     if song.producer_artists != []:
 
-        info_doc['composer'][0] = song.producer_artists[0]['name']
+        metadata['composer'][0] = song.producer_artists[0]['name']
 
         if len(song.producer_artists)>1:
 
             for i in range(1,len(song.producer_artists)):
 
-                info_doc['composer'].append(song.producer_artists[i]['name'])
+                metadata['composer'].append(song.producer_artists[i]['name'])
 
     for custom_perf in song._body['custom_performances']:
 
         lbl_perf =  custom_perf['label']
 
-        if 'publisher' in lbl_perf.lower() or 'publié' in lbl_perf.lower() or 'label' in lbl_perf.lower():
+        if ('publisher' in lbl_perf.lower()
+                or 'publié' in lbl_perf.lower()
+                or 'label' in lbl_perf.lower()):
 
             strg = ''
 
@@ -353,15 +360,15 @@ def info_title(search_title,length):
 
     #album info
 
-    if info_doc['album']== None:
+    if metadata['album']is None:
 
-        info_doc['album'] = song.title
-        info_doc['track'] = 1
-        info_doc['total track'] = 1
-        info_doc['album artist'] = song.artist
+        metadata['album'] = song.title
+        metadata['track'] = 1
+        metadata['total track'] = 1
+        metadata['album artist'] = song.artist
 
         #genres (spotipy)
-        result = sp.search(info_doc['artist'])
+        result = sp.search(metadata['artist'])
         len_res = min([len(result['tracks']['items']),9])
 
         if len_res == 0:
@@ -373,21 +380,21 @@ def info_title(search_title,length):
             track = result['tracks']['items'][i]
             artist = sp.artist(track["artists"][0]["external_urls"]["spotify"])
 
-            if artist['name'].lower() == info_doc['album artist'].lower():
+            if artist['name'].lower() == metadata['album artist'].lower():
 
                 break
 
-        info_doc['genre'] = artist['genres']
+        metadata['genre'] = artist['genres']
 
-        if info_doc['genre'] == []:
+        if metadata['genre'] == []:
 
-            info_doc['genre'] = ['']
+            metadata['genre'] = ['']
 
-        info_doc['art url'] = song._body['song_art_image_url']
+        metadata['art url'] = song._body['song_art_image_url']
 
     else:
 
-        info_doc['album_path'] = cmd.check_filename(info_doc['album'])
+        metadata['album_path'] = cmd.check_dirname(metadata['album'])
         album_id = song._body['album']['id']
         album_tracks = genius.album_tracks(album_id)['tracks']
 
@@ -395,28 +402,29 @@ def info_title(search_title,length):
 
             if track['song']['id'] == song._body['id']:
 
-                info_doc['track'] = track['number']
+                metadata['track'] = track['number']
 
         index_total_track = 1
         len_tracks = len(album_tracks)
 
-        while album_tracks[-index_total_track]['number'] == None and index_total_track < len_tracks:
+        while (album_tracks[-index_total_track]['number'] is None
+                and index_total_track < len_tracks):
 
             index_total_track += 1
 
-        info_doc['total track'] = album_tracks[-index_total_track]['number']
+        metadata['total track'] = album_tracks[-index_total_track]['number']
 
-        if info_doc['track'] == None:
+        if metadata['track'] is None:
 
-            info_doc['track'] = ''
-            info_doc['total track'] = ''
+            metadata['track'] = ''
+            metadata['total track'] = ''
 
-        info_doc['album artist'] = genius.album(album_id)['album']['artist']['name']
+        metadata['album artist'] = genius.album(album_id)['album']['artist']['name']
         
         #genres (spotipy)
 
         album = {'genres' : []}#if not able to find album
-        result = sp.search(info_doc['album'])
+        result = sp.search(metadata['album'])
 
         for i in range(len(result['tracks']['items'])):
 
@@ -434,154 +442,158 @@ def info_title(search_title,length):
 
         if album['genres'] == []:
 
-            result = sp.search(info_doc['artist'])
+            result = sp.search(metadata['artist'])
 
             for track in result['tracks']['items']:
 
-                artist = sp.artist(track["artists"][0]["external_urls"]["spotify"])
+                artist = sp.artist(
+                    track["artists"][0]["external_urls"]["spotify"])
 
-                if artist['name'].lower() == info_doc['album artist'].lower():
+                if artist['name'].lower() == metadata['album artist'].lower():
 
-                    info_doc['genre'] = artist['genres']
+                    metadata['genre'] = artist['genres']
                     break                
 
         else:
 
-            info_doc['genre'] = album['genres']
+            metadata['genre'] = album['genres']
 
-        if info_doc['genre'] == []:
+        if metadata['genre'] == []:
 
-            info_doc['genre'] = ['']
+            metadata['genre'] = ['']
 
-        info_doc['art url'] = genius.album(album_id)['album']['cover_art_url']
+        metadata['art url'] = genius.album(album_id)['album']['cover_art_url']
 
-        if 'png?' in info_doc['art url']:
+        if 'png?' in metadata['art url']:
 
-            info_doc['art url'] = song._body['song_art_image_url']
+            metadata['art url'] = song._body['song_art_image_url']
 
-
-
-    return info_doc
+    return metadata
 
 
-
-def info_query(url):
+def info_query(url: str) -> dict:
 
     search_title, length = info_url(url)
-    info_dic = info_title(search_title,length)
+    metadata = info_title(search_title, length)
 
-    return info_dic
-
-
-
-def info_query_url(url):
-
-    info_doc = info_query(url)
-    str_artist = info_doc['artist'][0]
-
-    if len(info_doc['artist'])>1:
-
-        for artist in range(1,len(info_doc['artist'])):
-
-            str_artist = str_artist+'; '+info_doc['artist'][artist]
-
-    info_doc['artist'] = str_artist
-
-    str_publisher = info_doc['publisher'][0]
-
-    if len(info_doc['publisher'])>1:
-
-        for pub in range(1,len(info_doc['publisher'])):
-
-            str_publisher = str_publisher+'; '+info_doc['publisher'][pub]
-
-    info_doc['publisher'] = str_publisher
-
-    str_genre = info_doc['genre'][0]
-
-    if len(info_doc['genre'])>1:
-
-        for genre in range(1,len(info_doc['genre'])):
-
-            str_genre = str_genre+'; '+info_doc['genre'][genre]
-
-    info_doc['genre'] = str_genre
-
-    str_comp = info_doc['composer'][0]
-
-    if len(info_doc['composer'])>1:
-
-        for comp in range(1,len(info_doc['composer'])):
-
-            str_comp = str_comp+'; '+info_doc['composer'][comp]
-
-    info_doc['composer'] = str_comp
-
-    str_tw = info_doc['text writer'][0]
-
-    if len(info_doc['text writer'])>1:
-
-        for tw in range(1,len(info_doc['text writer'])):
-
-            str_tw = str_tw+'; '+info_doc['text writer'][tw]
-
-    info_doc['text writer'] = str_tw
-
-    return info_doc
+    return metadata
 
 
+def info_query_url(url: str) -> dict:
 
-def info_query_title(title,length):
+    '''
+    Return metadata from url input
+    '''
 
-    info_doc = info_title(title,length)
-    str_artist = info_doc['artist'][0]
+    metadata = info_query(url)
+    str_artist = metadata['artist'][0]
 
-    if len(info_doc['artist'])>1:
+    if len(metadata['artist'])>1:
 
-        for artist in range(1,len(info_doc['artist'])):
+        for artist in range(1,len(metadata['artist'])):
 
-            str_artist = str_artist+'; '+info_doc['artist'][artist]
+            str_artist = str_artist+'; '+metadata['artist'][artist]
 
-    info_doc['artist'] = str_artist
+    metadata['artist'] = str_artist
 
-    str_publisher = info_doc['publisher'][0]
+    str_publisher = metadata['publisher'][0]
 
-    if len(info_doc['publisher'])>1:
+    if len(metadata['publisher'])>1:
 
-        for pub in range(1,len(info_doc['publisher'])):
+        for pub in range(1,len(metadata['publisher'])):
 
-            str_publisher = str_publisher+'; '+info_doc['publisher'][pub]
+            str_publisher = str_publisher+'; '+metadata['publisher'][pub]
 
-    info_doc['publisher'] = str_publisher
+    metadata['publisher'] = str_publisher
 
-    str_genre = info_doc['genre'][0]
+    str_genre = metadata['genre'][0]
 
-    if len(info_doc['genre'])>1:
+    if len(metadata['genre'])>1:
 
-        for genre in range(1,len(info_doc['genre'])):
+        for genre in range(1,len(metadata['genre'])):
 
-            str_genre = str_genre+'; '+info_doc['genre'][genre]
+            str_genre = str_genre+'; '+metadata['genre'][genre]
 
-    info_doc['genre'] = str_genre
+    metadata['genre'] = str_genre
 
-    str_comp = info_doc['composer'][0]
+    str_comp = metadata['composer'][0]
 
-    if len(info_doc['composer'])>1:
+    if len(metadata['composer'])>1:
 
-        for comp in range(1,len(info_doc['composer'])):
+        for comp in range(1,len(metadata['composer'])):
 
-            str_comp = str_comp+'; '+info_doc['composer'][comp]
+            str_comp = str_comp+'; '+metadata['composer'][comp]
 
-    info_doc['composer'] = str_comp
+    metadata['composer'] = str_comp
 
-    str_tw = info_doc['text writer'][0]
+    str_tw = metadata['text writer'][0]
 
-    if len(info_doc['text writer'])>1:
+    if len(metadata['text writer'])>1:
 
-        for tw in range(1,len(info_doc['text writer'])):
+        for tw in range(1,len(metadata['text writer'])):
 
-            str_tw = str_tw+'; '+info_doc['text writer'][tw]
+            str_tw = str_tw+'; '+metadata['text writer'][tw]
 
-    info_doc['text writer'] = str_tw
+    metadata['text writer'] = str_tw
 
-    return info_doc
+    return metadata
+
+
+def info_query_title(title: str,length: str) -> dict:
+
+    '''
+    Return metadata with a title input
+    '''
+
+    metadata = info_title(title,length)
+    str_artist = metadata['artist'][0]
+
+    if len(metadata['artist'])>1:
+
+        for artist in range(1,len(metadata['artist'])):
+
+            str_artist = str_artist+'; '+metadata['artist'][artist]
+
+    metadata['artist'] = str_artist
+
+    str_publisher = metadata['publisher'][0]
+
+    if len(metadata['publisher'])>1:
+
+        for pub in range(1,len(metadata['publisher'])):
+
+            str_publisher = str_publisher+'; '+metadata['publisher'][pub]
+
+    metadata['publisher'] = str_publisher
+
+    str_genre = metadata['genre'][0]
+
+    if len(metadata['genre'])>1:
+
+        for genre in range(1,len(metadata['genre'])):
+
+            str_genre = str_genre+'; '+metadata['genre'][genre]
+
+    metadata['genre'] = str_genre
+
+    str_comp = metadata['composer'][0]
+
+    if len(metadata['composer'])>1:
+
+        for comp in range(1,len(metadata['composer'])):
+
+            str_comp = str_comp+'; '+metadata['composer'][comp]
+
+    metadata['composer'] = str_comp
+
+    str_tw = metadata['text writer'][0]
+
+    if len(metadata['text writer'])>1:
+
+        for tw in range(1,len(metadata['text writer'])):
+
+            str_tw = str_tw+'; '+metadata['text writer'][tw]
+
+    metadata['text writer'] = str_tw
+
+    return metadata
