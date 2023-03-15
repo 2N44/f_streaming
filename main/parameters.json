@@ -1,1 +1,1 @@
-{"path": "Music", "token genius": "", "spotify client id": "", "spotify client secret": "", "format": "mp3", "format_index": 0, "bitrate": 320000, "bitrate_index": 2}
+{"font": "Liberation Sans", "platform": "Linux", "screen_size_index": 1, "cover_art_dl": true, "monoartist": false, "path": "Download Directory", "token genius": "Genius Token", "spotify client id": "Spotify Client ID", "spotify client secret": "Spotify Client Secret", "format": "mp3", "format_index": 0, "bitrate": 320000, "bitrate_index": 2}
