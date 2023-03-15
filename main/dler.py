@@ -10,7 +10,7 @@ import subprocess
 import os
 import requests
 import shutil
-import command as cmd
+import util
 
 
 #useful class and function
@@ -64,11 +64,11 @@ def dl_from_to(
         result = ydl.extract_info(yt_url, download=False)
         video = result['entries'][0] if 'entries' in result else result
 
-    init_time = cmd.sub_time(from_time,'00:00:30')
+    init_time = util.sub_time(from_time,'00:00:30')
     url = video['formats'][0]['url']
     ext = video['formats'][0]['ext']
 
-    if 'codec' in video['formats'][0]::
+    if 'codec' in video['formats'][0]:
 
         codec = video['formats'][0]['acodec']
 
@@ -120,12 +120,12 @@ def dl_from_to(
 def dl_art(path: str, metadata: dict):
 
     image_url = metadata['art url']
-    filename = cmd.pic_path(path,metadata)
+    filename = util.pic_path(path, metadata)
     r = requests.get(image_url, stream = True)
 
     # Check if the image was retrieved successfully
 
-    if r.status_code == 200 and filename[-1] == "g" :
+    if r.status_code == 200 and filename[-1] == 'g' :
 
         # Set decode_content value to True, otherwise the downloaded image file's size will be zero.
 
