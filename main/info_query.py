@@ -7,17 +7,17 @@
 from __future__ import unicode_literals
 import youtube_dl, lyricsgenius, spotipy, os
 from spotipy.oauth2 import SpotifyClientCredentials
-import command as cmd
+import util
 
-
-saved_param = cmd.read_param(os.path.join(cmd.file_path(),'parameters.json'))
+saved_param = util.read_param(os.path.join(util.file_path(),'parameters.json'))
 client_id = saved_param['spotify client id']
 client_secret = saved_param['spotify client secret']
 token_genius = saved_param['token genius']
 
 client_credentials_manager = SpotifyClientCredentials(
     client_id=client_id,
-    client_secret=client_secret)
+    client_secret=client_secret
+)
 sp = spotipy.Spotify(client_credentials_manager = client_credentials_manager)
 genius = lyricsgenius.Genius(token_genius)
 
@@ -25,12 +25,12 @@ genius = lyricsgenius.Genius(token_genius)
 def clean_title(title: str) -> str:
 
     '''
-    delete certain word patern
+        Delete certain word patern to obtain better genius result
     '''
 
     #delete strings in black_list.txt
 
-    forbiden_str = cmd.read_txt(os.path.join(cmd.file_path(), 'black_list.txt'))
+    forbiden_str = util.read_txt(os.path.join(util.file_path(), 'black_list.txt'))
 
     for word in forbiden_str :
 
@@ -123,11 +123,122 @@ def clean_title(title: str) -> str:
 
     return title
 
+def clean_lyrics(lyrics: str)-> str:
+
+    '''
+        Delete certain typo & patern from scraping lyrics
+    '''
+
+    #Delete header
+    pos_lyr = lyrics.find(' Lyrics\n')
+    lyrics = lyrics[pos_lyr+9:]
+
+    typo_list = [
+        '\n1\n',
+        '\n2\n',
+        '\n3\n',
+        '\n4\n',
+        '\n5\n',
+        '\n6\n',
+        '\n7\n',
+        '\n8\n',
+        '\n9\n',
+        '\n10\n',
+        '\n11\n',
+        '\n12\n',
+        '\n13\n',
+        '\n14\n',
+        '\n15\n',
+        '\n16\n',
+        '\n17\n',
+        '\n18\n',
+        '\n19\n',
+        '\n20\n',
+        '\n21\n',
+        '\n22\n',
+        '\n23\n',
+        '\n24\n',
+        '\n25\n',
+        '\n26\n',
+        '\n27\n',
+        '\n28\n',
+        '\n29\n',
+        '\n30\n',
+        '\n31\n',
+        '\n32\n',
+        '\n33\n',
+        '\n34\n',
+        '\n35\n',
+        '\n36\n',
+        '\n37\n',
+        '\n38\n',
+        '\n29\n',
+        '\n40\n',
+        '\n41\n',
+        '\n42\n',
+        '\n43\n',
+        '\n44\n',
+        '\n45\n',
+        '\n46\n',
+        '\n47\n',
+        '\n48\n',
+        '\n49\n',
+        '\n50\n',
+        '\n51\n',
+        '\n52\n',
+        '\n53\n',
+        '\n54\n',
+        '\n55\n',
+        '\n56\n',
+        '\n57\n',
+        '\n58\n',
+        '\n59\n',
+        '\n60\n',
+        '\nEmbed',
+        '\nYou might also like\n',
+    ]
+
+    for typo in typo_list:
+
+        if typo in lyrics:
+
+            pos_typo = lyrics.find(typo)
+            lyrics = lyrics[:pos_typo+1]+lyrics[pos_typo+len(typo):]
+
+    #correct useless carriage returns
+    char_index = 0
+    dynamic_len = len(lyrics)
+    while char_index < dynamic_len:
+
+        if lyrics[char_index] == '\n' and dynamic_len-char_index != 1:
+
+            if lyrics[char_index+1].islower() or lyrics[char_index+1] == ',' or lyrics[char_index+1] == ' ' or lyrics[char_index+1] == '"' or lyrics[char_index+1:char_index+5] == '[?]\n' or lyrics[char_index+1:char_index+3] == ']\n':
+
+                lyrics = lyrics[:char_index]+lyrics[char_index+1:]
+                dynamic_len -= 1
+
+            elif char_index > 0 and lyrics[char_index-1] == '"':
+
+                lyrics = lyrics[:char_index]+lyrics[char_index+1:]
+                dynamic_len -= 1
+
+            elif char_index > 1 and lyrics[char_index-2:char_index] == '& ':
+
+                lyrics = lyrics[:char_index]+lyrics[char_index+1:]
+                dynamic_len -= 1
+
+        elif dynamic_len-char_index == 1:
+
+            return lyrics[:dynamic_len-1]
+
+        char_index += 1
+
+    return lyrics
 
 def info_playlist(url_playlist: str) -> list:
 
     '''
-    Exract list of videos url from a playlist url
+        Scrap list of videos url from a youtube/soundcloud playlist url or a spotify playlist url (but slower)
     '''
 
     class MyLogger(object):
@@ -165,28 +276,48 @@ def info_playlist(url_playlist: str) -> list:
         'progress_hooks': [my_hook]
     }
 
-    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+    #search youtube video from parsed data from spotify url 
 
-        result = ydl.extract_info(url_playlist, download=False)
-        n_vid = len(result['entries']) if 'entries' in result else 1
-        video = result['entries'][0] if 'entries' in result else result
-        videos = [video['webpage_url']]
+    if 'spotify.com' in url_playlist:
 
-        if n_vid > 1:
+        playlist_uri = url_playlist.split("/")[-1].split("?")[0]
+        video_url_list = []
 
-            for i in range(1,n_vid):
+        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
 
-                video = result['entries'][i]['webpage_url']
-                videos.append(video)
+            for track in sp.playlist_tracks(playlist_uri)["items"]:
 
-    return videos
+                result = ydl.extract_info('ytsearch:'+track['track']['name']+' '+track['track']['artists'][0]['name'], download=False)
+                video = result['entries'][0] if 'entries' in result else result
+                video_url_list.append(video['webpage_url'])
+
+    #parse data from youtube or soundcloud url
+
+    else:
+
+        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+
+            result = ydl.extract_info(url_playlist, download=False)
+            n_vid = len(result['entries']) if 'entries' in result else 1
+            video = result['entries'][0] if 'entries' in result else result
+            video_url_list = [video['webpage_url']]
+
+            if n_vid > 1:
+
+                for i in range(1,n_vid):
+
+                    video = result['entries'][i]['webpage_url']
+                    video_url_list.append(video)
+
+    return video_url_list
 
 
 def info_url(url_video: str) -> (str, str):
 
+    '''
+        Scrap info from youtube page
+    '''
 
-
-    #extract info from youtube page
     class MyLogger(object):
         def debug(self, msg):
             pass
@@ -232,7 +363,7 @@ def info_url(url_video: str) -> (str, str):
 
         search_title = search_title + ' - ' + video['uploader']
 
-    length = cmd.convert_time(video['duration'])
+    length = util.convert_time(video['duration'])
 
     return (search_title, length)
 
@@ -276,6 +407,7 @@ def info_title(search_title: str,length: str) -> dict:
                 'date' :              '',
                 'publisher' :       [''],
                 'lyrics' :            '',
+                'desc' :              '',
                 'genre' :           [''],
                 'length' :             0,
                 'language' :          '',
@@ -284,7 +416,7 @@ def info_title(search_title: str,length: str) -> dict:
                 'year' :               0,
                 'art url' :           '',
                 'album_path' :      'music',
-                }
+    }
 
     #search on genius
     song = genius.search_song(search_title)
@@ -308,7 +440,7 @@ def info_title(search_title: str,length: str) -> dict:
 
             metadata['artist'].append(song._body['featured_artists'][i]['name'])
 
-    if song.year != None:
+    if song.year is not None:
 
         metadata['date'] = song.year
 
@@ -316,9 +448,10 @@ def info_title(search_title: str,length: str) -> dict:
 
         metadata['year'] = metadata['date'][0:4]
 
-    metadata['lyrics'] = song.lyrics
+    metadata['lyrics'] = clean_lyrics(song.lyrics)
+    metadata['desc'] = song._body['description_annotation']['annotations'][0]['body']['plain']
 
-    #rajouter custom performance
+    #add custom performance
 
     if song.writer_artists != []:
 
@@ -360,7 +493,7 @@ def info_title(search_title: str,length: str) -> dict:
 
     #album info
 
-    if metadata['album']is None:
+    if metadata['album'] is None:
 
         metadata['album'] = song.title
         metadata['track'] = 1
@@ -394,7 +527,7 @@ def info_title(search_title: str,length: str) -> dict:
 
     else:
 
-        metadata['album_path'] = cmd.check_dirname(metadata['album'])
+        metadata['album_path'] = util.check_dirname(metadata['album'])
         album_id = song._body['album']['id']
         album_tracks = genius.album_tracks(album_id)['tracks']
 
