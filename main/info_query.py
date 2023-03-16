@@ -285,9 +285,28 @@ def info_playlist(url_playlist: str) -> list:
 
         with youtube_dl.YoutubeDL(ydl_opts) as ydl:
 
-            for track in sp.playlist_tracks(playlist_uri)["items"]:
+            if 'playlist' in url_playlist:
 
-                result = ydl.extract_info('ytsearch:'+track['track']['name']+' '+track['track']['artists'][0]['name'], download=False)
+                for track in sp.playlist_tracks(playlist_uri)["items"]:
+
+                    result = ydl.extract_info('ytsearch:'+track['track']['name']+' '+track['track']['artists'][0]['name'], download=False)
+                    video = result['entries'][0] if 'entries' in result else result
+                    video_url_list.append(video['webpage_url'])
+
+            elif 'album' in url_playlist:
+
+                for track in sp.album_tracks(playlist_uri)["items"]:
+
+                    artist_name = track['artists'][0]['name']
+                    track_name = sp.track(track['uri'])['name']
+                    result = ydl.extract_info('ytsearch:'+track_name+' '+artist_name, download=False)
+                    video = result['entries'][0] if 'entries' in result else result
+                    video_url_list.append(video['webpage_url'])
+
+            elif 'track' in url_playlist:
+
+                track = sp.track(track['uri'])
+                result = ydl.extract_info('ytsearch:'+track['name']+' '+track['artists'][0]['name'], download=False)
                 video = result['entries'][0] if 'entries' in result else result
                 video_url_list.append(video['webpage_url'])
 
@@ -315,7 +334,7 @@ def info_playlist(url_playlist: str) -> list:
 def info_url(url_video: str) -> (str, str):
 
     '''
-        Scrap info from youtube page
+        Scrap info from youtube/soundcloud page
     '''
 
     class MyLogger(object):
@@ -615,7 +634,7 @@ def info_query(url: str) -> dict:
 def info_query_url(url: str) -> dict:
 
     '''
-    Return metadata from url input
+        Return metadata from url input
     '''
 
     metadata = info_query(url)
@@ -675,7 +694,7 @@ def info_query_url(url: str) -> dict:
 def info_query_title(title: str,length: str) -> dict:
 
     '''
-    Return metadata with a title input
+        Return metadata with a title input
     '''
 
     metadata = info_title(title,length)
