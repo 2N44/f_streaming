@@ -60,6 +60,7 @@ class dl_win():
         self.software_path = software_path
         self.url = url
         self.art_path = art_path
+        self.custom_cover_art = False
 
     def _covert_art(self):
 
@@ -245,10 +246,13 @@ class dl_win():
         # loading_dl.progress()
 
         #download art
-        if self.saved_par['cover_art_dl']:
+        if self.saved_par['cover_art_dl'] and not util.check_art(path, self.song_tag):
 
             dl.dl_art(path, self.song_tag)
-            self.art_path = util.pic_path(path, self.song_tag)
+
+            if not self.custom_cover_art:
+
+                self.art_path = util.pic_path(path, self.song_tag)
 
         # loading_dl.progress_label = 'Downloading audio file ...'
         # loading_dl.progress()
@@ -282,6 +286,7 @@ class dl_win():
         )
         audio_tags = tagger.Tagger(self.saved_par, audio_path, self.art_path)
         audio_tags.tag(self.song_tag)
+        self.custom_cover_art = False
         
         self.dl_window.destroy()
 
@@ -345,6 +350,7 @@ class dl_win():
         if type(cover_art_path) is str and len(cover_art_path) > 0:
 
             self.art_path = cover_art_path
+            self.custom_cover_art = True
 
             if self.saved_par['screen_size_index'] == 1:
 
