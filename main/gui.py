@@ -348,17 +348,17 @@ class dl_win():
 
             if self.saved_par['screen_size_index'] == 1:
 
-                self.dl_button_fg_6 = Image.open(self._covert_art()).resize((180, 180))
-                self.dl_button_bg_6.paste(self.dl_button_fg_6, (8, 8))
-                self.dl_button_img_6 = itk.PhotoImage(self.dl_button_bg_6)
+                self.dl_button_fg_7 = Image.open(self._covert_art()).resize((180, 180))
+                self.dl_button_bg_7.paste(self.dl_button_fg_7, (8, 8))
+                self.dl_button_img_7 = itk.PhotoImage(self.dl_button_bg_7)
 
             else:
 
-                self.dl_button_fg_6 = Image.open(self._covert_art()).resize((135, 135))
-                self.dl_button_bg_6.paste(self.dl_button_fg_6, (6, 6))
-                self.dl_button_img_6 = itk.PhotoImage(self.dl_button_bg_6)
+                self.dl_button_fg_7 = Image.open(self._covert_art()).resize((135, 135))
+                self.dl_button_bg_7.paste(self.dl_button_fg_7, (6, 6))
+                self.dl_button_img_7 = itk.PhotoImage(self.dl_button_bg_7)
 
-            self.dl_button_6.configure(image=self.dl_button_img_6)
+            self.dl_button_7.configure(image=self.dl_button_img_7)
 
 #        covert_art = filedialog.askopenfile(
 #            mode='r',
@@ -650,7 +650,7 @@ class dl_win():
         self.cancel_button_img_2 = PhotoImage(
             file=os.path.join(self.cancel_path, 'button_2.png'))
         self.cancel_button_2 = Button(
-            master=self._window,
+            master=self.cancel_window,
             image=self.cancel_button_img_2,
             borderwidth=0,
             highlightthickness=0,
